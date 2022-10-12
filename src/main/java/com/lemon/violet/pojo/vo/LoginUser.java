@@ -1,5 +1,6 @@
 package com.lemon.violet.pojo.vo;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.lemon.violet.pojo.entry.SysUser;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,6 +13,7 @@ import java.util.Collection;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIgnoreProperties({"enabled","accountNonExpired", "accountNonLocked", "credentialsNonExpired", "authorities"})
 public class LoginUser implements UserDetails {
     private SysUser sysUser;
     @Override

@@ -7,4 +7,6 @@ import com.lemon.violet.pojo.vo.ResponseResult;
 public interface SysUserService extends IService<SysUser> {
 
     ResponseResult login(SysUser sysUser);
+
+    ResponseResult logout();
 }

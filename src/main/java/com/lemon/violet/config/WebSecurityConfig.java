@@ -1,5 +1,8 @@
 package com.lemon.violet.config;
 
+import com.lemon.violet.filter.JwtAuthenticationTokenFilter;
+import com.lemon.violet.handler.security.AccessDeniedHandlerImpl;
+import com.lemon.violet.handler.security.AuthenticationEntryPointImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -13,6 +16,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -22,6 +28,19 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
+    @Bean
+    public JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter(){
+        return new JwtAuthenticationTokenFilter();
+    }
+
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler(){
+        return new AccessDeniedHandlerImpl();
+    }
+    @Bean
+    public AuthenticationEntryPoint authenticationEntryPoint(){
+        return new AuthenticationEntryPointImpl();
+    }
 
     @Bean
     @Override
@@ -42,6 +61,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/user/login").anonymous()
                 // 除上面外的所有请求全部需要鉴权认证
                 .anyRequest().authenticated();
+
+        //登录过滤器
+        http.addFilterBefore(jwtAuthenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+
+        //认证、授权异常处理
+        http.exceptionHandling()
+                .accessDeniedHandler(accessDeniedHandler())
+                .authenticationEntryPoint(authenticationEntryPoint());
+
+        //跨域
+        http.cors();
     }
+
+
+
 
 }
